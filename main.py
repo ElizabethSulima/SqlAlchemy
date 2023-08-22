@@ -64,10 +64,15 @@ sale_6 = Sale(price="16.00", data_sale="2018-10-25T10:59:56.230Z", count=1, id_s
 session.add_all([sale_1, sale_2, sale_3, sale_4, sale_5, sale_6])
 session.commit()
 
-def publisher_list():
-    publisher_name = str(input("Введите имя издателя: "))
-    q = session.query(Publisher).join(Book.publisher).filter(Publisher.name == publisher_name)
-    # print(q)
-        #     print(f"{Book.title} | {Shop.name} | {Sale.price} | {Sale.data_sale}")
+def get_shops(publisher_id_name):
+    info_publisher = session.query(Book.title, Shop.name, Sale.price, Sale.data_sale).select_from(Shop).join(Stock).join(Book).join(Publisher).join(Sale)
+    if publisher_id_name.isdigit():
+        info_ = info_publisher.filter(Publisher.id == publisher_id_name).all()
+    else:
+        info_ = info_publisher.filter(Publisher.name == publisher_id_name).all()
+    for book_title, shop_name, sale_price, sale_data in info_:
+        print(f"{book_title: <40} | {shop_name: <10} | {sale_price: <8} | {sale_data.strftime('%d-%m-%Y')}")
 
-publisher_list()
+if __name__ == '__main__':
+    publisher_id_name = input("Введите id или имя издателя: ")
+    get_shops(publisher_id_name)
